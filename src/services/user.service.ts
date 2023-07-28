@@ -11,12 +11,6 @@ export class UserService {
 	) {}
 
 	async findAll(): Promise<User[]> {
-		const users: User[] = await this.userRepository.find();
-		return users;
-	}
-
-	async getNumberOfUsers(): Promise<number> {
-		const [users, nr] = await this.userRepository.findAndCount();
-		return users.length;
+		return await this.userRepository.find();
 	}
 }

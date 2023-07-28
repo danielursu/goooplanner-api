@@ -16,9 +16,4 @@ export class AppController {
 	getAll(): Promise<User[]> {
 		return this.userService.findAll();
 	}
-
-	@Get("number")
-	getNumberOfUsers(): Promise<number> {
-		return this.userService.getNumberOfUsers();
-	}
 }
