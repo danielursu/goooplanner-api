@@ -10,11 +10,11 @@ export class UserService {
 	constructor(
 		@InjectRepository(User)
 		private readonly userRepository: Repository<User>,
-		private readonly UserMapper: UserMapper,
-	) { }
+		private readonly userMapper: UserMapper,
+	) {}
 
 	async findAll(): Promise<UserDTO[]> {
 		const users: User[] = await this.userRepository.find();
-		return this.UserMapper.toDTOs(users);
+		return this.userMapper.toDTOs(users);
 	}
 }
