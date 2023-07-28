@@ -3,8 +3,11 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigModule } from "@nestjs/config";
-import { UserService } from "./services/user.service";
-import { User } from "./entities/user.entity";
+import { UserService } from "./user/user.service";
+import { User } from "./user/user.entity";
+import { UserMapper } from "./user/user.mapper";
+import { UserController } from "./user/user.controller";
+import { UserModule } from "./user/user.module";
 
 @Module({
 	imports: [
@@ -18,9 +21,9 @@ import { User } from "./entities/user.entity";
 			database: "goooplanner",
 			entities: ["dist/**/*.entity{.ts,.js}"],
 		}),
-		TypeOrmModule.forFeature([User]),
+		UserModule,
 	],
 	controllers: [AppController],
-	providers: [AppService, UserService],
+	providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
