@@ -5,10 +5,12 @@ export const dataSourceOptions: DataSourceOptions = {
 	host: "localhost",
 	port: 5432,
 	username: "postgres",
-	password: "010920",
+	password: "victor0110",
 	database: "goooplanner",
 	entities: ["dist/**/*.entity{.ts,.js}"],
 	migrations: ["dist/db/migrations/*.js"],
+
+	// synchronize: true,
 };
 
 const dataSource = new DataSource(dataSourceOptions);
