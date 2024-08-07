@@ -8,14 +8,8 @@ import { UserModule } from "./user/user.module";
 import { dataSourceOptions } from "../db/data-source";
 
 @Module({
-	imports: [
-		ConfigModule.forRoot({ isGlobal: true }),
-		TypeOrmModule.forRoot(
-			dataSourceOptions,
-		),
-		UserModule,
-	],
+	imports: [ConfigModule.forRoot({ isGlobal: true }), TypeOrmModule.forRoot(dataSourceOptions), UserModule],
 	controllers: [AppController],
 	providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
