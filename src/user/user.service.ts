@@ -12,7 +12,7 @@ export class UserService {
 		@InjectRepository(User)
 		private readonly userRepository: Repository<User>,
 		private readonly userMapper: UserMapper,
-	) { }
+	) {}
 
 	async findAll(): Promise<UserDTO[]> {
 		const users: User[] = await this.userRepository.find();
@@ -29,7 +29,7 @@ export class UserService {
 		return this.userRepository.save(user);
 	}
 
-	async setRememberToken() {
-		return "token";
-	}
+	// async setRememberToken(userId: number, token: string): Promise<void> {
+	// 	await this.userRepository.update(userId, { rememberToken: token });
+	// }
 }
