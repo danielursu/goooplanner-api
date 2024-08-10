@@ -28,8 +28,4 @@ export class UserService {
 		const user = this.userRepository.create({ ...userDTO, password: hashedPassword });
 		return this.userRepository.save(user);
 	}
-
-	// async setRememberToken(userId: number, token: string): Promise<void> {
-	// 	await this.userRepository.update(userId, { rememberToken: token });
-	// }
 }

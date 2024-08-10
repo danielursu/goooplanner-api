@@ -24,10 +24,4 @@ export class AuthService {
 			access_token: this.jwtService.sign(payload),
 		};
 	}
-
-	// async createRememberToken(user: any) {
-	// 	const token = this.jwtService.sign({ email: user.email, sub: user.userId }, { expiresIn: "30d" });
-	// 	await this.userService.setRememberToken(user.id, token);
-	// 	return token;
-	// }
 }
