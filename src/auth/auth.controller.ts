@@ -21,9 +21,6 @@ export class AuthController {
 	@Post("login")
 	@UseGuards(LocalGuard)
 	async login(@Req() req: Request, @Res() res: Response) {
-		// console.log("Request object: ", req.user);
-		// return req.user;
-
 		const user = req.user as User;
 		const refreshToken = user.refresh_token;
 
@@ -34,14 +31,27 @@ export class AuthController {
 		const maxAge = (exp - currentTime) * 1000;
 
 		res.cookie("refresh_token", refreshToken, {
-			httpOnly: false,
-			secure: false,
+			httpOnly: false, // switch to true
+			secure: false, // switch to true
 			sameSite: "strict",
 			maxAge: maxAge,
 			path: "/",
 		});
 		console.log("Request object: ", req.user);
 		return res.json(req.user);
+	}
+
+	// log out on the server, so I can remove the refresh_token from the cookies
+	@Post("logout")
+	async logout(@Res({ passthrough: true }) response: Response) {
+		response.clearCookie("refresh_token", {
+			httpOnly: false, // switch to true
+			secure: false, // switch to true
+			sameSite: "strict",
+			path: "/",
+		});
+
+		return { message: "Logged out successfully" };
 	}
 
 	@Get("get-cookie")

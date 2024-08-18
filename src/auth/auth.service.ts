@@ -11,7 +11,7 @@ import { UserDTO } from "src/user/dto/user.dto";
 export class AuthService {
 	constructor(private userService: UserService, private jwtService: JwtService) {}
 
-	// the code returned here will be eventually returned by the server
+	// method used to validate user in the local.strategy.ts
 	async validateUser({ email, password }: AuthPayloadDTO): Promise<any> {
 		const user = await this.userService.findOne(email);
 
