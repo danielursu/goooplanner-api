@@ -19,20 +19,20 @@ export class AuthService {
 			const { password, ...result } = user;
 			return {
 				access_token: this.jwtService.sign(result),
-				refresh_token: this.jwtService.sign(result, { expiresIn: "5m" }),
+				refresh_token: this.jwtService.sign(result, { expiresIn: "30d" }),
 			};
 		}
 		return null;
 	}
 
-	async login({ email, password }: AuthPayloadDTO) {
-		const payload = { email, password };
-		console.log("auth service payload: ", payload);
-		return {
-			access_token: this.jwtService.sign(payload),
-			refresh_token: this.jwtService.sign(payload, { expiresIn: "5m" }),
-		};
-	}
+	// async login({ email, password }: AuthPayloadDTO) {
+	// 	const payload = { email, password };
+	// 	console.log("auth service payload: ", payload);
+	// 	return {
+	// 		access_token: this.jwtService.sign(payload),
+	// 		refresh_token: this.jwtService.sign(payload, { expiresIn: "30d" }),
+	// 	};
+	// }
 
 	async register(userDTO: UserDTO) {
 		const user = await this.userService.create(userDTO);

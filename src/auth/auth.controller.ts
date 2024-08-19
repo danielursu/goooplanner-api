@@ -24,15 +24,15 @@ export class AuthController {
 		const user = req.user as User;
 		const refreshToken = user.refresh_token;
 
-		// calcular the expiration
+		// calculate the expiration
 		const decodedToken: { exp: number } = jwtDecode(refreshToken);
 		const exp = decodedToken.exp;
 		const currentTime = Math.floor(Date.now() / 1000);
 		const maxAge = (exp - currentTime) * 1000;
 
 		res.cookie("refresh_token", refreshToken, {
-			httpOnly: false, // switch to true
-			secure: false, // switch to true
+			httpOnly: false,
+			secure: false,
 			sameSite: "strict",
 			maxAge: maxAge,
 			path: "/",
@@ -45,8 +45,8 @@ export class AuthController {
 	@Post("logout")
 	async logout(@Res({ passthrough: true }) response: Response) {
 		response.clearCookie("refresh_token", {
-			httpOnly: false, // switch to true
-			secure: false, // switch to true
+			httpOnly: false,
+			secure: false,
 			sameSite: "strict",
 			path: "/",
 		});
@@ -54,16 +54,16 @@ export class AuthController {
 		return { message: "Logged out successfully" };
 	}
 
-	@Get("get-cookie")
-	getCookie(@Req() request: Request) {
-		const value = request.cookies["refresh_token"];
-		return value;
-	}
+	// @Get("get-cookie")
+	// getCookie(@Req() request: Request) {
+	// 	const value = request.cookies["refresh_token"];
+	// 	return value;
+	// }
 
 	@Post("register")
 	async register(@Body() userDTO: UserDTO) {
-		const user = await this.authService.register(userDTO);
-		return this.authService.login(user);
+		return await this.authService.register(userDTO);
+		// return this.authService.login(user);
 	}
 
 	// method to check the token status, if it is expired or not
