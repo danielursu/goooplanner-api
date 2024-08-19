@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { UnauthorizedException } from "@nestjs/common";
 import * as bcrypt from "bcryptjs";
+import { ConfigService } from "@nestjs/config";
 
 import { UserService } from "src/user/user.service";
 import { AuthPayloadDTO } from "./dto/auth.dto";
@@ -9,7 +10,11 @@ import { UserDTO } from "src/user/dto/user.dto";
 
 @Injectable()
 export class AuthService {
-	constructor(private userService: UserService, private jwtService: JwtService) {}
+	constructor(
+		private userService: UserService,
+		private jwtService: JwtService,
+		private configService: ConfigService,
+	) {}
 
 	// method used to validate user in the local.strategy.ts
 	async validateUser({ email, password }: AuthPayloadDTO): Promise<any> {
@@ -19,20 +24,13 @@ export class AuthService {
 			const { password, ...result } = user;
 			return {
 				access_token: this.jwtService.sign(result),
-				refresh_token: this.jwtService.sign(result, { expiresIn: "30d" }),
+				refresh_token: this.jwtService.sign(result, {
+					expiresIn: this.configService.get<string>("REFRESH_TOKEN_EXPIRATION_TIME"),
+				}),
 			};
 		}
 		return null;
 	}
-
-	// async login({ email, password }: AuthPayloadDTO) {
-	// 	const payload = { email, password };
-	// 	console.log("auth service payload: ", payload);
-	// 	return {
-	// 		access_token: this.jwtService.sign(payload),
-	// 		refresh_token: this.jwtService.sign(payload, { expiresIn: "30d" }),
-	// 	};
-	// }
 
 	async register(userDTO: UserDTO) {
 		const user = await this.userService.create(userDTO);

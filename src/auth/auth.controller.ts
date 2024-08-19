@@ -24,7 +24,6 @@ export class AuthController {
 		const user = req.user as User;
 		const refreshToken = user.refresh_token;
 
-		// calculate the expiration
 		const decodedToken: { exp: number } = jwtDecode(refreshToken);
 		const exp = decodedToken.exp;
 		const currentTime = Math.floor(Date.now() / 1000);
@@ -32,7 +31,7 @@ export class AuthController {
 
 		res.cookie("refresh_token", refreshToken, {
 			httpOnly: false,
-			secure: false,
+			secure: false, // switch to true in prod
 			sameSite: "strict",
 			maxAge: maxAge,
 			path: "/",
@@ -41,12 +40,11 @@ export class AuthController {
 		return res.json(req.user);
 	}
 
-	// log out on the server, so I can remove the refresh_token from the cookies
 	@Post("logout")
 	async logout(@Res({ passthrough: true }) response: Response) {
 		response.clearCookie("refresh_token", {
 			httpOnly: false,
-			secure: false,
+			secure: false, // switch to true in prod
 			sameSite: "strict",
 			path: "/",
 		});
@@ -54,16 +52,15 @@ export class AuthController {
 		return { message: "Logged out successfully" };
 	}
 
-	// @Get("get-cookie")
-	// getCookie(@Req() request: Request) {
-	// 	const value = request.cookies["refresh_token"];
-	// 	return value;
-	// }
+	@Get("get-cookie")
+	getCookie(@Req() request: Request) {
+		const value = request.cookies["refresh_token"];
+		return value;
+	}
 
 	@Post("register")
 	async register(@Body() userDTO: UserDTO) {
 		return await this.authService.register(userDTO);
-		// return this.authService.login(user);
 	}
 
 	// method to check the token status, if it is expired or not
