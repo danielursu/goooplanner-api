@@ -1,25 +1,38 @@
-import { Injectable } from "@nestjs/common";
-import { User } from "./user.entity";
-import { UserDTO } from "./dto/user.dto";
+import { Injectable } from '@nestjs/common';
+import { User } from './user.entity';
+import { CreateUserDto, UpdateUserDto, UserResponseDto } from './dto/user.dto';
 
 @Injectable()
 export class UserMapper {
-	toDTOs(users: User[]): UserDTO[] {
-		const userDTOs: UserDTO[] = [];
-		for (let i = 0; i < users.length; ++i) {
-			userDTOs.push(this.toDTO(users[i]));
-		}
+  toEntity(createUserDto: CreateUserDto): User {
+    const user = new User();
+    user.firstName = createUserDto.firstName;
+    user.lastName = createUserDto.lastName;
+    user.email = createUserDto.email;
+    user.password = createUserDto.password;
+    return user;
+  }
 
-		return userDTOs;
-	}
+  toResponseDto(user: User): UserResponseDto {
+    return {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+    };
+  }
 
-	toDTO(user: User): UserDTO {
-		return {
-			id: user.id,
-			firstName: user.firstName,
-			lastName: user.lastName,
-			email: user.email,
-			password: user.password,
-		};
-	}
+  updateEntity(user: User, updateUserDto: UpdateUserDto): User {
+    const updatedUser = new User(user);
+    if (updateUserDto.firstName) {
+      updatedUser.firstName = updateUserDto.firstName;
+    }
+    if (updateUserDto.lastName) {
+      updatedUser.lastName = updateUserDto.lastName;
+    }
+    if (updateUserDto.email) {
+      updatedUser.email = updateUserDto.email;
+    }
+    return updatedUser;
+  }
 }
