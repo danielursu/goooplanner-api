@@ -1,60 +1,81 @@
-import { Injectable } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import { UnauthorizedException } from "@nestjs/common";
-import * as bcrypt from "bcryptjs";
-import { ConfigService } from "@nestjs/config";
-
-import { UserService } from "src/user/user.service";
-import { AuthPayloadDTO } from "./dto/auth.dto";
-import { UserDTO } from "src/user/dto/user.dto";
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcryptjs';
+import { ConfigService } from '@nestjs/config';
+import { UserService } from '../user/user.service';
+import { CreateUserDto } from '../user/dto/user.dto';
+import { UserResponseDto } from '../user/dto/user.dto';
 
 @Injectable()
 export class AuthService {
-	constructor(
-		private userService: UserService,
-		private jwtService: JwtService,
-		private configService: ConfigService,
-	) {}
+  constructor(
+    private userService: UserService,
+    private jwtService: JwtService,
+    private configService: ConfigService,
+  ) {}
 
-	// method used to validate user in the local.strategy.ts
-	async validateUser({ email, password }: AuthPayloadDTO): Promise<any> {
-		const user = await this.userService.findOne(email);
+  async validateUser(email: string, password: string): Promise<any> {
+    const user = await this.userService.findByEmail(email);
+    
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
-		if (user && (await bcrypt.compare(password, user.password))) {
-			const { password, ...result } = user;
-			return {
-				access_token: this.jwtService.sign(result),
-				refresh_token: this.jwtService.sign(result, {
-					expiresIn: this.configService.get<string>("REFRESH_TOKEN_EXPIRATION_TIME"),
-				}),
-			};
-		}
-		return null;
-	}
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
-	async register(userDTO: UserDTO) {
-		const user = await this.userService.create(userDTO);
-		return user;
-	}
+    return this.generateTokens(user);
+  }
 
-	// refresh token method, it is used to refresh access_token
-	async refreshToken(refresh_token: string) {
-		try {
-			const decoded = this.jwtService.verify(refresh_token);
+  async register(createUserDto: CreateUserDto): Promise<UserResponseDto> {
+    try {
+      const user = await this.userService.create(createUserDto);
+      return user;
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException('Email already in use');
+      }
+      throw error;
+    }
+  }
 
-			const newPayload = {
-				id: decoded.id,
-				firstName: decoded.firstName,
-				lastName: decoded.lastName,
-				email: decoded.email,
-			};
-			const tokenPayload = {
-				access_token: this.jwtService.sign(newPayload),
-			};
-			console.log("new access_token", tokenPayload);
-			return tokenPayload;
-		} catch (error) {
-			throw new UnauthorizedException("Invalid refresh token");
-		}
-	}
+  async refreshTokens(refreshToken: string) {
+    try {
+      const payload = this.jwtService.verify(refreshToken, {
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+      });
+
+      const user = await this.userService.findOne(payload.id);
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      return this.generateTokens(user);
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
+
+  private generateTokens(user: UserResponseDto) {
+    const payload = {
+      id: user.id,
+      email: user.email,
+    };
+
+    return {
+      access_token: this.jwtService.sign(payload, {
+        expiresIn: this.configService.get<string>('JWT_EXPIRATION_TIME') || '15m',
+      }),
+      refresh_token: this.jwtService.sign(payload, {
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRATION_TIME') || '7d',
+      }),
+    };
+  }
 }
