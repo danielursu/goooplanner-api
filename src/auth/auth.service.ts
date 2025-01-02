@@ -4,9 +4,9 @@ import { UnauthorizedException } from "@nestjs/common";
 import * as bcrypt from "bcryptjs";
 import { ConfigService } from "@nestjs/config";
 
-import { UserService } from "src/user/user.service";
+import { UserService } from "../user/user.service"; // Make sure this import is correct
 import { AuthPayloadDTO } from "./dto/auth.dto";
-import { UserDTO } from "src/user/dto/user.dto";
+import { UserDTO } from "../user/dto/user.dto";
 
 @Injectable()
 export class AuthService {
@@ -23,9 +23,11 @@ export class AuthService {
 		if (user && (await bcrypt.compare(password, user.password))) {
 			const { password, ...result } = user;
 			return {
-				access_token: this.jwtService.sign(result),
+				access_token: this.jwtService.sign(result, {
+					expiresIn: this.configService.get<string>("JWT_EXPIRATION_TIME") || "1h",
+				}),
 				refresh_token: this.jwtService.sign(result, {
-					expiresIn: this.configService.get<string>("REFRESH_TOKEN_EXPIRATION_TIME"),
+					expiresIn: this.configService.get<string>("REFRESH_TOKEN_EXPIRATION_TIME") || "7d",
 				}),
 			};
 		}
@@ -49,7 +51,9 @@ export class AuthService {
 				email: decoded.email,
 			};
 			const tokenPayload = {
-				access_token: this.jwtService.sign(newPayload),
+				access_token: this.jwtService.sign(newPayload, {
+					expiresIn: this.configService.get<string>("JWT_EXPIRATION_TIME") || "1h",
+				}),
 			};
 			console.log("new access_token", tokenPayload);
 			return tokenPayload;
