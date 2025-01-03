@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Event } from '../event/event.entity';
 
 @Entity()
 export class User {
@@ -38,6 +39,9 @@ export class User {
     select: false,
   })
   password: string;
+
+  @OneToMany(() => Event, (event) => event.user)
+  events: Event[];
 
   constructor(partial?: Partial<User>) {
     Object.assign(this, partial);

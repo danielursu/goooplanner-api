@@ -1,25 +1,20 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { AppController } from './app.controller.js';
+import { AppService } from './app.service.js';
+import { UserModule } from './user/user.module.js';
+import { AuthModule } from './auth/auth.module.js';
+import { AppDataSource } from './data-source.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
-import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
-import { AppDataSource } from './data-source';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { HealthModule } from './health/health.module';
+import { HealthModule } from './health/health.module.js';
+import { EventModule } from './event/event.module.js';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot(AppDataSource.options),
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 100,
-    }]),
     UserModule,
     AuthModule,
     HealthModule,
+    EventModule,
   ],
   controllers: [AppController],
   providers: [AppService],
