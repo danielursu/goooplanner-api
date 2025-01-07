@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.1.1] - 2025-01-07
+
+### Added
+- Password strength validation for user registration
+- Improved error handling for authentication failures
+- Added logging for user authentication attempts
+
+### Fixed
+- Fixed user registration validation
+- Improved error messages for authentication failures
+- Added proper password validation rules
+
+### Security
+- Enhanced password requirements
+- Added validation for user credentials
+- Improved error handling to prevent information leakage
+
 ## [v0.1.0] - 2025-01-02
 
 ### Added

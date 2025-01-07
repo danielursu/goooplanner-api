@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from '../user/user.entity';
 
 @Entity()
@@ -41,7 +41,11 @@ export class Event {
   type: string;
 
   @ManyToOne(() => User, (user) => user.events)
+  @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @Column({ name: 'user_id', nullable: true })
+  userId: number;
 
   constructor(partial?: Partial<Event>) {
     Object.assign(this, partial);
